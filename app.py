@@ -103,12 +103,12 @@ def upload_file():
                 "records"
             )
 
-            # if high_risk_jobs:
-            #     email_sent = send_alert_email(high_risk_jobs)
-            #     if email_sent:
-            #         print("High risk alert email sent successfully")
-            #     else:
-            #         pass
+            if high_risk_jobs:
+                email_sent = send_email_with_html(high_risk_jobs)
+                if email_sent:
+                    print("High risk alert email sent successfully")
+                else:
+                    pass
             # Generate visualizations
             plot_urls = generate_visualizations(results)
 
