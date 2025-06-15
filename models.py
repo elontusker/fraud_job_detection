@@ -117,3 +117,31 @@ def train_model():
     joblib.dump(model, "model.joblib")
 
     return model
+
+
+def predict_new_data(model, new_data):
+    # Keep job_id for reference
+    job_ids = new_data["job_id"].copy()
+
+    # Preprocess new data - handle missing fraudulent column
+    new_data = preprocess_data(new_data)
+
+    # Drop columns that might not exist in test data
+    columns_to_drop = ["fraudulent", "job_id"]
+    columns_to_drop = [col for col in columns_to_drop if col in new_data.columns]
+    X_new = new_data.drop(columns_to_drop, axis=1)
+
+    # Predict
+    predictions = model.predict(X_new)
+    probabilities = model.predict_proba(X_new)[:, 1]
+
+    # Create results dataframe
+    results = new_data.copy()
+    results["job_id"] = job_ids
+    results["fraud_prediction"] = predictions
+    results["fraud_probability"] = probabilities
+
+    # Sort by most suspicious first
+    results = results.sort_values("fraud_probability", ascending=False)
+
+    return results
