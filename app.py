@@ -11,37 +11,80 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+
 app.config["UPLOAD_FOLDER"] = "uploads"
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max upload
+# Load environment variables from .env
+load_dotenv()
+
+EMAIL_SENDER = os.getenv("EMAIL_SENDER")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 
-# Email configuration (move to config file in production)
-def send_email_with_html(sender, password, recipient_email, subject, reason_text):
-    msg = MIMEMultipart()
-    msg["From"] = sender
-    msg["To"] = "pavanpuvan2003@gmail.com"
-    msg["Subject"] = subject
-
-    # Format HTML message
-    html = f"""
-    <html>
-        <body>
-            <h2>🚨 Fraudulent Job Alert</h2>
-            <p>Dear user,</p>
-            <p>We've flagged the following job posting as <strong>potentially fraudulent</strong> based on our AI analysis.</p>
-            <p><strong>Reason:</strong> {reason_text}</p>
-            <p>Please exercise caution and do not share personal information or money.</p>
-            <br>
-            <p>Stay safe,<br>Fraud Detection Team</p>
-        </body>
-    </html>
-    """
-
-    msg.attach(MIMEText(html, "html"))
-
+def send_alert_email(
+    sender, password, recipient_email, high_risk_jobs, single_alert_reason=None
+):
     try:
+        msg = MIMEMultipart()
+        msg["From"] = sender
+        msg["To"] = recipient_email
+
+        # Case 1: Multiple jobs alert
+        if high_risk_jobs:
+            msg["Subject"] = (
+                f"🚨 High Risk Job Alerts - {datetime.now().strftime('%Y-%m-%d')}"
+            )
+            html = f"""<h2>High Risk Job Postings Detected</h2>
+                    <p>{len(high_risk_jobs)} job postings were flagged as high risk:</p>
+                    <table border="1" cellpadding="5" cellspacing="0">
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Title</th>
+                            <th>Risk Score</th>
+                        </tr>"""
+            for job in high_risk_jobs:
+                # Clean each field of non-ASCII characters
+                job_id = str(job["job_id"]).encode("ascii", "ignore").decode("ascii")
+                title = str(job["title"]).encode("ascii", "ignore").decode("ascii")
+                score = f"{job['fraud_probability']*100:.1f}%"
+
+                html += f"""<tr>
+                            <td>{job_id}</td>
+                            <td>{title}</td>
+                            <td>{score}</td>
+                        </tr>"""
+            html += "</table><p>Please review these listings immediately.</p>"
+
+        # Case 2: Single job alert with reason
+        elif single_alert_reason:
+            msg["Subject"] = "🚨 Fraudulent Job Alert"
+            # Clean the reason text
+            clean_reason = (
+                str(single_alert_reason).encode("ascii", "ignore").decode("ascii")
+            )
+            html = f"""
+            <html>
+                <body>
+                    <h2>🚨 Fraudulent Job Alert</h2>
+                    <p>Dear user,</p>
+                    <p>We've flagged the following job posting as <strong>potentially fraudulent</strong> based on our AI analysis.</p>
+                    <p><strong>Reason:</strong> {clean_reason}</p>
+                    <p>Please exercise caution and do not share personal information or money.</p>
+                    <br>
+                    <p>Stay safe,<br>Fraud Detection Team</p>
+                </body>
+            </html>
+            """
+        else:
+            return False, "No data provided to send alert."
+
+        # Attach the HTML content with UTF-8 encoding
+        msg.attach(MIMEText(html, "html", "utf-8"))
+
+        # Send the email
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         server.login(sender, password)
@@ -104,23 +147,25 @@ def upload_file():
             high_risk_jobs = results[results["fraud_probability"] > 0.7].to_dict(
                 "records"
             )
+            print(f"Found {len(high_risk_jobs)} high risk jobs")  # Debug
 
             if high_risk_jobs:
-                email_sent = send_email_with_html(high_risk_jobs)
-                if email_sent:
-                    print("High risk alert email sent successfully")
-                else:
-                    pass
-            # Generate visualizations
+                print("Attempting to send email...")  # Debug
+                success, message = send_alert_email(
+                    EMAIL_SENDER,
+                    EMAIL_PASSWORD,
+                    "afzal.shaquib379@gmail.com",
+                    high_risk_jobs,
+                )
+                print(f"Email result: {success}, {message}")  # Debug
+                if not success:
+                    print(f"Failed to send email: {message}")
+
+            # Rest of your code...
             plot_urls = generate_visualizations(results)
-
-            # Prepare top suspicious listings
             top_suspicious = results[["job_id", "title", "fraud_probability"]].head(10)
-
-            # Clean up
             os.remove(filepath)
 
-            # Calculate risk counts for the summary cards
             if "fraud_probability" in results.columns:
                 high_risk_count = len(results[results["fraud_probability"] > 0.7])
                 medium_risk_count = len(
@@ -143,6 +188,7 @@ def upload_file():
                 low_risk_count=low_risk_count,
             )
         except Exception as e:
+            print(f"Error in upload_file: {str(e)}")  # Debug
             return render_template("error.html", error=str(e))
 
     return redirect(url_for("index"))
