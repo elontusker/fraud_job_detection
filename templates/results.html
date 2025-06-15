@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Analysis Results | Job Fraud Detection</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --accent-color: #4cc9f0;
+        --dark-color: #2b2d42;
+        --light-color: #f8f9fa;
+        --danger-color: #ef233c;
+        --success-color: #2ec4b6;
+      }
+
+      body {
+        background-color: #f5f7ff;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--dark-color);
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 0 0 20px 20px;
+      }
+
+      .plot-container {
+        margin: 2rem 0;
+        padding: 2rem;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 5px solid var(--accent-color);
+      }
+
+      .plot-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .plot-img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .table-container {
+        margin-top: 2rem;
+        overflow-x: auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .suspicious-table {
+        margin-top: 1.5rem;
+      }
+
+      .suspicious-table th {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .fraud-score {
+        font-weight: bold;
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+      }
+
+      .high-risk {
+        background-color: rgba(239, 35, 60, 0.1);
+        color: var(--danger-color);
+      }
+
+      .medium-risk {
+        background-color: rgba(255, 196, 0, 0.1);
+        color: #ffc400;
+      }
+
+      .low-risk {
+        background-color: rgba(46, 196, 182, 0.1);
+        color: var(--success-color);
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+      }
+
+      .btn-secondary {
+        border-radius: 50px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108, 117, 125, 0.2);
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-weight: 700;
+      }
+
+      .card-highlight {
+        border-left: 5px solid var(--danger-color);
+      }
+
+      .risk-summary {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .risk-card {
+        padding: 1.5rem;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        min-width: 200px;
+        margin: 0.5rem;
+        transition: transform 0.3s ease;
+      }
+
+      .risk-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .risk-count {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      .high-risk-card {
+        border-top: 4px solid var(--danger-color);
+      }
+
+      .medium-risk-card {
+        border-top: 4px solid #ffc400;
+      }
+
+      .low-risk-card {
+        border-top: 4px solid var(--success-color);
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          padding: 1.5rem 0;
+        }
+
+        .plot-container,
+        .table-container {
+          padding: 1.5rem;
+        }
+
+        .risk-summary {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .risk-card {
+          width: 100%;
+          margin-bottom: 1rem;
+        }
+      }
+
+      /* Animation classes */
+      .fade-in {
+        animation: fadeIn 0.8s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .risk-meter {
+        height: 10px;
+        border-radius: 5px;
+        background: linear-gradient(
+          to right,
+          var(--success-color),
+          #ffc400,
+          var(--danger-color)
+        );
+        margin: 1rem 0;
+        position: relative;
+      }
+
+      .risk-indicator {
+        position: absolute;
+        top: -5px;
+        width: 15px;
+        height: 20px;
+        background-color: var(--dark-color);
+        border-radius: 3px;
+        transform: translateX(-50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header animate__animated animate__fadeIn">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h1 class="mb-3">
+              <i class="fas fa-search-dollar mr-3"></i>Job Fraud Analysis
+              Results
+            </h1>
+            <p class="lead mb-0">
+              Detailed insights from your job postings analysis
+            </p>
+          </div>
+          <div class="col-md-4 text-md-right">
+            <a href="/" class="btn btn-light btn-lg"
+              ><i class="fas fa-arrow-left mr-2"></i>Back to Upload</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Risk Summary Cards -->
+      <div class="risk-summary fade-in">
+        <div
+          class="risk-card high-risk-card animate__animated animate__fadeInUp"
+        >
+          <div class="risk-count text-danger">{{ high_risk_count }}</div>
+          <h5>High Risk</h5>
+          <p class="text-muted">Probability > 70%</p>
+        </div>
+        <div
+          class="risk-card medium-risk-card animate__animated animate__fadeInUp animate__delay-1s"
+        >
+          <div class="risk-count" style="color: #ffc400;">
+            {{ medium_risk_count }}
+          </div>
+          <h5>Medium Risk</h5>
+          <p class="text-muted">30-70% Probability</p>
+        </div>
+        <div
+          class="risk-card low-risk-card animate__animated animate__fadeInUp animate__delay-2s"
+        >
+          <div class="risk-count text-success">{{ low_risk_count }}</div>
+          <h5>Low Risk</h5>
+          <p class="text-muted">Probability < 30%</p>
+        </div>
+      </div>
+
+      <div class="row fade-in">
+        <div class="col-lg-6">
+          <div class="plot-container animate__animated animate__fadeInLeft">
+            <h3>
+              <i class="fas fa-chart-bar mr-2"></i>Fraud Probability
+              Distribution
+            </h3>
+            <div class="risk-meter">
+              <div class="risk-indicator" style="left: 30%;"></div>
+            </div>
+            <img
+              src="data:image/png;base64,{{ plot_urls['histogram'] }}"
+              class="plot-img mt-3"
+            />
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="plot-container animate__animated animate__fadeInRight">
+            <h3>
+              <i class="fas fa-chart-pie mr-2"></i>Fraudulent vs Genuine Jobs
+            </h3>
+            <img
+              src="data:image/png;base64,{{ plot_urls['pie'] }}"
+              class="plot-img"
+            />
+          </div>
+        </div>
+      </div>
+
+      {% if 'features' in plot_urls %}
+      <div class="plot-container animate__animated animate__fadeIn">
+        <h3><i class="fas fa-lightbulb mr-2"></i>Top Predictive Features</h3>
+        <p class="text-muted">
+          These features most influenced the fraud detection model
+        </p>
+        <img
+          src="data:image/png;base64,{{ plot_urls['features'] }}"
+          class="plot-img"
+        />
+      </div>
+      {% endif %}
+
+      <div class="plot-container animate__animated animate__fadeIn">
+        <h3>
+          <i class="fas fa-exclamation-triangle mr-2"></i>Top 10 Most Suspicious
+          Job Postings
+        </h3>
+        <div class="table-responsive">
+          <table class="table table-hover suspicious-table">
+            <thead class="thead-dark">
+              <tr>
+                <th><i class="fas fa-id-badge mr-2"></i>Job ID</th>
+                <th><i class="fas fa-heading mr-2"></i>Title</th>
+                <th><i class="fas fa-shield-alt mr-2"></i>Risk Level</th>
+                <th><i class="fas fa-percentage mr-2"></i>Fraud Probability</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for job in top_suspicious %}
+              <tr
+                class="{% if job.fraud_probability > 0.7 %}table-danger{% elif job.fraud_probability > 0.3 %}table-warning{% else %}table-success{% endif %}"
+              >
+                <td>{{ job.job_id }}</td>
+                <td>{{ job.title }}</td>
+                <td>
+                  {% if job.fraud_probability > 0.7 %}
+                  <span class="badge badge-danger">High Risk</span>
+                  {% elif job.fraud_probability > 0.3 %}
+                  <span class="badge badge-warning">Medium Risk</span>
+                  {% else %}
+                  <span class="badge badge-success">Low Risk</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span
+                    class="fraud-score {% if job.fraud_probability > 0.7 %}high-risk{% elif job.fraud_probability > 0.3 %}medium-risk{% else %}low-risk{% endif %}"
+                  >
+                    {{ "%.1f"|format(job.fraud_probability*100) }}%
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-container animate__animated animate__fadeIn">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3 class="mb-0">
+            <i class="fas fa-table mr-2"></i>Detailed Results
+          </h3>
+          <div>
+            <button onclick="window.print()" class="btn btn-primary mr-2">
+              <i class="fas fa-print mr-2"></i>Print Report
+            </button>
+            <a href="/static/results.csv" class="btn btn-success">
+              <i class="fas fa-file-csv mr-2"></i>Export CSV
+            </a>
+          </div>
+        </div>
+        <div class="table-responsive">
+          {{ tables[0]|safe }}
+        </div>
+      </div>
+
+      <div class="text-center mt-5 mb-5">
+        <a href="/" class="btn btn-secondary btn-lg mr-3">
+          <i class="fas fa-arrow-left mr-2"></i>Back to Upload
+        </a>
+        <button onclick="window.print()" class="btn btn-primary btn-lg">
+          <i class="fas fa-print mr-2"></i>Print Full Report
+        </button>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      // Simple animation triggers
+      $(document).ready(function () {
+        $(".plot-container").hover(
+          function () {
+            $(this).addClass("animate__pulse");
+          },
+          function () {
+            $(this).removeClass("animate__pulse");
+          }
+        );
+
+        // Animate risk indicator on histogram
+        setTimeout(function () {
+          $(".risk-indicator").css("left", "70%");
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

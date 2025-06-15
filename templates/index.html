@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Job Fraud Detection | Upload</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --accent-color: #4cc9f0;
+        --dark-color: #2b2d42;
+        --light-color: #f8f9fa;
+        --danger-color: #ef233c;
+        --success-color: #2ec4b6;
+      }
+
+      body {
+        background-color: #f5f7ff;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--dark-color);
+        min-height: 100vh;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 0 0 20px 20px;
+        text-align: center;
+      }
+
+      .upload-container {
+        margin: 3rem auto;
+        padding: 2.5rem;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        max-width: 800px;
+        border: 2px dashed rgba(67, 97, 238, 0.3);
+        text-align: center;
+      }
+
+      .upload-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        border-color: var(--accent-color);
+      }
+
+      .upload-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+      }
+
+      .btn-upload {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+      }
+
+      .btn-upload:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+      }
+
+      .file-input-wrapper {
+        position: relative;
+        margin: 2rem 0;
+      }
+
+      .file-input-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        background-color: rgba(248, 249, 250, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .file-input-label:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(67, 97, 238, 0.05);
+      }
+
+      .file-input-label i { 
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+        color: var(--primary-color);
+      }
+
+      .file-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .file-name {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--primary-color);
+        font-weight: 500;
+      }
+
+      .how-it-works {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 3rem auto;
+        max-width: 800px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .step {
+        display: flex;
+        margin-bottom: 1.5rem;
+        align-items: flex-start;
+      }
+
+      .step-number {
+        background-color: var(--primary-color);
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+        font-weight: bold;
+      }
+
+      .step-content {
+        flex-grow: 1;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-weight: 700;
+      }
+
+      .lead {
+        font-size: 1.25rem;
+        opacity: 0.9;
+      }
+
+      .supported-formats {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+      }
+
+      .supported-formats i {
+        margin-right: 0.3rem;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          padding: 2rem 0;
+        }
+
+        .upload-container {
+          padding: 1.5rem;
+          margin: 2rem auto;
+        }
+
+        .btn-upload {
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+        }
+      }
+
+      /* Animation classes */
+      .fade-in {
+        animation: fadeIn 0.8s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header animate__animated animate__fadeIn">
+      <div class="container">
+        <h1>
+          <i class="fas fa-search-dollar mr-3"></i>Job Posting Fraud Detection
+        </h1>
+        <p class="lead">
+          Identify potentially fraudulent job listings with our AI-powered
+          analysis
+        </p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="upload-container fade-in animate__animated animate__fadeInUp">
+        <div class="upload-icon">
+          <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <h2>Upload Job Postings</h2>
+        <p class="text-muted">
+          Get instant fraud detection analysis for your job listings
+        </p>
+
+        <form
+          method="post"
+          action="/upload"
+          enctype="multipart/form-data"
+          id="uploadForm"
+        >
+          <div class="file-input-wrapper">
+            <label for="fileInput" class="file-input-label">
+              <i class="fas fa-file-upload"></i>
+              <span id="fileLabelText">Choose a file or drag it here</span>
+              <input
+                type="file"
+                class="file-input"
+                id="fileInput"
+                name="file"
+                accept=".csv,.xlsx,.xls"
+                required
+              />
+            </label>
+            <div id="fileNameDisplay" class="file-name"></div>
+          </div>
+
+          <button type="submit" class="btn btn-upload">
+            <i class="fas fa-chart-line mr-2"></i>Analyze Jobs
+          </button>
+
+          <div class="supported-formats">
+            <p>
+              <i class="fas fa-info-circle"></i>Supported formats: CSV, Excel
+              (.xlsx, .xls)
+            </p>
+          </div>
+        </form>
+      </div>
+
+      <div
+        class="how-it-works fade-in animate__animated animate__fadeInUp animate__delay-1s"
+      >
+        <h3 class="mb-4"><i class="fas fa-cogs mr-2"></i>How It Works</h3>
+
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h5>Upload Your File</h5>
+            <p class="text-muted mb-0">
+              Upload a spreadsheet containing job postings data with details
+              like title, description, and requirements.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h5>AI Analysis</h5>
+            <p class="text-muted mb-0">
+              Our machine learning model evaluates each job posting for
+              potential fraud indicators.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h5>Get Results</h5>
+            <p class="text-muted mb-0">
+              View detailed analysis with fraud probabilities, risk levels, and
+              visual insights.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Handle file input change
+        $("#fileInput").change(function () {
+          const fileName = $(this).val().split("\\").pop();
+          if (fileName) {
+            $("#fileLabelText").text(fileName);
+            $("#fileNameDisplay").html(
+              '<i class="fas fa-check-circle"></i> ' + fileName
+            );
+          } else {
+            $("#fileLabelText").text("Choose a file or drag it here");
+            $("#fileNameDisplay").text("");
+          }
+        });
+
+        // Handle drag and drop
+        $(".file-input-label").on("dragover", function (e) {
+          e.preventDefault();
+          $(this).addClass("dragover");
+          $(this).css({
+            "border-color": "var(--primary-color)",
+            "background-color": "rgba(67, 97, 238, 0.05)",
+          });
+        });
+
+        $(".file-input-label").on("dragleave", function (e) {
+          e.preventDefault();
+          $(this).removeClass("dragover");
+          $(this).css({
+            "border-color": "#ccc",
+            "background-color": "rgba(248, 249, 250, 0.5)",
+          });
+        });
+
+        $(".file-input-label").on("drop", function (e) {
+          e.preventDefault();
+          $(this).removeClass("dragover");
+          const files = e.originalEvent.dataTransfer.files;
+          if (files.length > 0) {
+            $("#fileInput")[0].files = files;
+            const fileName = files[0].name;
+            $("#fileLabelText").text(fileName);
+            $("#fileNameDisplay").html(
+              '<i class="fas fa-check-circle"></i> ' + fileName
+            );
+          }
+        });
+
+        // Form submission feedback
+        $("#uploadForm").submit(function () {
+          $(".btn-upload").html(
+            '<i class="fas fa-spinner fa-spin mr-2"></i> Analyzing...'
+          );
+          $(".btn-upload").prop("disabled", true);
+        });
+      });
+    </script>
+  </body>
+</html>
