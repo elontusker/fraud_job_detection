@@ -16,12 +16,13 @@ app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "uploads"
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max upload
 
+
 # Email configuration (move to config file in production)
 def send_email_with_html(sender, password, recipient_email, subject, reason_text):
     msg = MIMEMultipart()
-    msg['From'] = sender
-    msg['To'] = recipient_email
-    msg['Subject'] = subject
+    msg["From"] = sender
+    msg["To"] = "pavanpuvan2003@gmail.com"
+    msg["Subject"] = subject
 
     # Format HTML message
     html = f"""
@@ -49,6 +50,7 @@ def send_email_with_html(sender, password, recipient_email, subject, reason_text
         return True, "Email sent successfully."
     except Exception as e:
         return False, f"Error sending email: {str(e)}"
+
 
 # Load or train model
 if not os.path.exists("model.joblib"):
