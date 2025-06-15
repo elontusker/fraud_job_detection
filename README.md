@@ -50,3 +50,42 @@ A machine learning system to detect fraudulent job postings, with a Flask-based 
 5. Modular code structure
 
 The system handles class imbalance through class weighting in the Random Forest classifier and evaluates performance using F1-score as requested. The dashboard provides clear visual insights into the analysis results.
+
+✅ Model Performance Summary
+The model achieved an overall accuracy of 88% on the test dataset of 2,861 samples.
+
+Class 0 (likely the majority or "non-fraud" class):
+
+Precision: 1.00 → Every predicted class 0 was actually class 0.
+
+Recall: 0.88 → 88% of actual class 0 instances were correctly identified.
+
+F1-score: 0.93 → High harmonic mean of precision and recall indicates strong performance on this class.
+
+Class 1 (likely the minority or "fraud" class):
+
+Precision: 0.29 → Only 29% of predicted fraud cases were truly fraud.
+
+Recall: 0.96 → The model correctly identified 96% of actual fraud cases.
+
+F1-score: 0.45 → Indicates trade-off between low precision and high recall.
+
+📊 Macro and Weighted Averages:
+Macro average:
+
+Precision: 0.64, Recall: 0.92, F1-score: 0.69
+
+This gives equal weight to both classes and highlights imbalance in performance across classes.
+
+Weighted average:
+
+Precision: 0.96, Recall: 0.88, F1-score: 0.91
+
+This accounts for the class imbalance, reflecting the model’s high performance on the majority class.
+
+🔍 Insights:
+The model is highly sensitive (recall) for detecting fraud (Class 1), which is often desirable in fraud detection use cases.
+
+However, precision for fraud is low, meaning many false positives — the model flags many non-fraud cases as fraud.
+
+This trade-off suggests the model is tuned for recall over precision, potentially acceptable depending on the business goal (e.g., flagging all potential fraud for further review).
