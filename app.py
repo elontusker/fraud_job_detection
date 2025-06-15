@@ -17,8 +17,39 @@ app.config["UPLOAD_FOLDER"] = "uploads"
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max upload
 
 # Email configuration (move to config file in production)
+def send_email_with_html(sender, password, recipient_email, subject, reason_text):
+    msg = MIMEMultipart()
+    msg['From'] = sender
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
 
-#############################################
+    # Format HTML message
+    html = f"""
+    <html>
+        <body>
+            <h2>🚨 Fraudulent Job Alert</h2>
+            <p>Dear user,</p>
+            <p>We've flagged the following job posting as <strong>potentially fraudulent</strong> based on our AI analysis.</p>
+            <p><strong>Reason:</strong> {reason_text}</p>
+            <p>Please exercise caution and do not share personal information or money.</p>
+            <br>
+            <p>Stay safe,<br>Fraud Detection Team</p>
+        </body>
+    </html>
+    """
+
+    msg.attach(MIMEText(html, "html"))
+
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(sender, password)
+        server.send_message(msg)
+        server.quit()
+        return True, "Email sent successfully."
+    except Exception as e:
+        return False, f"Error sending email: {str(e)}"
+
 # Load or train model
 if not os.path.exists("model.joblib"):
     print("Training model...")
